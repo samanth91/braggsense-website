@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blade Optical Fibre Monitor – 4-Blade Mill</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+  <div style="background:#070d16;color:#d5deea;font:600 13px/1.2 system-ui,sans-serif;padding:9px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:40;">
+    <a href="../index.html" style="color:#00d4e4;text-decoration:none;">← BraggSense</a>
+    <span style="opacity:.75;font-weight:500;">WT-04 live mill monitor</span>
+    <a href="../contact.html" style="color:#f4f7fb;text-decoration:none;">Talk to us</a>
+  </div>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <div class="brand-mark">BLADE</div>
+        <div class="brand-sub">4-Blade Mill · 32 Fibres</div>
+      </div>
+      <h1 class="title">Live Monitoring – WT-04 / 4-Blade Rotor</h1>
+      <div class="header-actions">
+        <span id="liveBadge" class="live-badge idle">IDLE</span>
+        <span id="clock" class="clock">--:--:--</span>
+      </div>
+    </header>
+
+    <!-- Blade selector (mill-wide) -->
+    <div class="blade-selector-bar panel">
+      <div class="blade-selector-label">
+        <strong>Turbine Blades</strong>
+        <span>4 blades · 8 fibres each · <b id="sensorTotal">32</b> optical sensors</span>
+      </div>
+      <div class="blade-pills" id="bladePills">
+        <button class="blade-pill active" data-blade="1">Blade 1</button>
+        <button class="blade-pill" data-blade="2">Blade 2</button>
+        <button class="blade-pill" data-blade="3">Blade 3</button>
+        <button class="blade-pill" data-blade="4">Blade 4</button>
+      </div>
+      <div class="blade-rotor-mini" id="rotorMini" title="Rotor phase diagram">
+        <svg viewBox="0 0 80 80" width="56" height="56">
+          <circle cx="40" cy="40" r="6" fill="#2f6fed"/>
+          <g id="rotorArms"></g>
+        </svg>
+      </div>
+    </div>
+
+    <section class="top-grid">
+      <div class="panel blade-panel">
+        <div class="panel-label">
+          3D Rotor (Blade.step × 4)
+          <span class="panel-label-hint">drag · zoom · click any of 32 sensors</span>
+        </div>
+        <div class="blade-stage" id="bladeStage" aria-label="4-blade rotor with optical fibre sensors"></div>
+        <p class="hint">
+          Active: <strong id="activeBladeLabel">Blade 1</strong> ·
+          Click a fibre on any blade to stream that channel (B#–C#) from <code>bladedata.csv</code>
+        </p>
+      </div>
+
+      <div class="panel sensor-list-panel">
+        <div class="panel-label">
+          Fibres on <span id="listBladeTitle">Blade 1</span>
+          <span class="panel-label-hint">8 of 32</span>
+        </div>
+        <div id="sensorList" class="sensor-list"></div>
+      </div>
+
+      <div class="kpi-column">
+        <div class="kpi-row">
+          <div class="panel kpi-card cycle-card">
+            <div class="kpi-title">Cycle Count</div>
+            <div class="kpi-value red" id="cycleCount">—</div>
+            <div class="kpi-sub">of <span id="totalCycles">132</span> recorded</div>
+          </div>
+          <div class="panel kpi-card gauge-card">
+            <div class="kpi-title">Estimated Cycles Left</div>
+            <div class="gauge-wrap">
+              <canvas id="cyclesGauge" width="160" height="100"></canvas>
+              <div class="gauge-value" id="cyclesLeft">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="panel metric-card">
+            <div class="metric-title">Peak Strain <span class="unit">με</span></div>
+            <div class="metric-value blue" id="peakStrain">—</div>
+            <div class="metric-minmax">
+              <span>Min <b id="strainMin">—</b></span>
+              <span>Max <b id="strainMax">—</b></span>
+            </div>
+          </div>
+          <div class="panel metric-card">
+            <div class="metric-title">Flapwise Force <span class="unit">N</span></div>
+            <div class="metric-value blue" id="appliedLoad">—</div>
+            <div class="metric-minmax">
+              <span>Min <b id="loadMin">—</b></span>
+              <span>Max <b id="loadMax">—</b></span>
+            </div>
+          </div>
+          <div class="panel metric-card">
+            <div class="metric-title">Root Moment <span class="unit">N·m</span></div>
+            <div class="metric-value blue" id="rootMoment">—</div>
+            <div class="metric-minmax">
+              <span>Min <b id="momentMin">—</b></span>
+              <span>Max <b id="momentMax">—</b></span>
+            </div>
+          </div>
+          <div class="panel metric-card">
+            <div class="metric-title">Blade Twist <span class="unit">°</span></div>
+            <div class="metric-value amber" id="damageIndex">—</div>
+            <div class="metric-minmax">
+              <span>Min <b id="damageMin">—</b></span>
+              <span>Max <b id="damageMax">—</b></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel mill-overview">
+          <div class="mill-overview-title">Mill overview · live peak strain (με)</div>
+          <div class="mill-bars" id="millBars">
+            <div class="mill-bar" data-b="1"><span>B1</span><div class="bar-track"><i id="barB1"></i></div><b id="valB1">—</b></div>
+            <div class="mill-bar" data-b="2"><span>B2</span><div class="bar-track"><i id="barB2"></i></div><b id="valB2">—</b></div>
+            <div class="mill-bar" data-b="3"><span>B3</span><div class="bar-track"><i id="barB3"></i></div><b id="valB3">—</b></div>
+            <div class="mill-bar" data-b="4"><span>B4</span><div class="bar-track"><i id="barB4"></i></div><b id="valB4">—</b></div>
+          </div>
+        </div>
+
+        <div class="panel sim-controls">
+          <div class="sim-info">
+            <strong id="activeSensorName">No sensor selected</strong>
+            <span id="simStatus">Select a fibre (any blade) to start simulation</span>
+          </div>
+          <div class="sim-buttons">
+            <button id="btnPlay" class="btn primary" disabled>▶ Run Simulation</button>
+            <button id="btnPause" class="btn" disabled>⏸ Pause</button>
+            <button id="btnReset" class="btn" disabled>↺ Reset</button>
+            <label class="speed-label">
+              Speed
+              <select id="speedSelect">
+                <option value="1">1×</option>
+                <option value="5" selected>5×</option>
+                <option value="10">10×</option>
+                <option value="25">25×</option>
+                <option value="50">50×</option>
+              </select>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="live">Live View</button>
+      <button class="tab" data-tab="fingerprint">Digital FingerPrint</button>
+      <button class="tab" data-tab="twist">Twist Tests</button>
+    </div>
+
+    <!-- LIVE VIEW – blade3-style stacked monitor charts -->
+    <section class="live-monitor" id="tab-live">
+      <div class="monitor-header">
+        <div>
+          <h2>LIVE MONITORING – <span id="monitorTitle">WT-04 / BLADE 1</span></h2>
+          <div class="legend-inline" id="fbgLegend"></div>
+        </div>
+        <div class="monitor-live-meta">
+          <span class="dot-live" id="monitorDot"></span>
+          <span id="monitorTime">Time: —</span>
+        </div>
+      </div>
+
+      <div class="monitor-stack">
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>STRAIN VS TIME</h3>
+              <span class="axis-note">Y-Axis: Microstrain (με) · Active fibre 4 FBGs</span>
+            </div>
+            <div class="live-chip" id="liveStrainChip">— με</div>
+          </div>
+          <div class="monitor-chart">
+            <canvas id="strainChart"></canvas>
+          </div>
+        </div>
+
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>FORCE VS TIME</h3>
+              <span class="axis-note">Y-Axis: Force (N) · Flapwise</span>
+            </div>
+            <div class="live-chip green" id="liveForceChip">— N</div>
+          </div>
+          <div class="monitor-chart short">
+            <canvas id="forceChart"></canvas>
+          </div>
+          <div class="stat-row">
+            <div>Max Load <b id="statForceMax">—</b></div>
+            <div>Min Load <b id="statForceMin">—</b></div>
+            <div>Mean Load <b id="statForceMean">—</b></div>
+            <div>Frequency <b>0.20 Hz</b></div>
+          </div>
+        </div>
+
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>MOMENT VS TIME</h3>
+              <span class="axis-note">Y-Axis: Moment (N·m) · Root Bending</span>
+            </div>
+            <div class="live-chip yellow" id="liveMomentChip">— N·m</div>
+          </div>
+          <div class="monitor-chart short">
+            <canvas id="momentChart"></canvas>
+          </div>
+          <div class="stat-row">
+            <div>Max Moment <b id="statMomMax">—</b></div>
+            <div>Min Moment <b id="statMomMin">—</b></div>
+            <div>Mean Moment <b id="statMomMean">—</b></div>
+            <div>Frequency <b>0.20 Hz</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="monitor-side-row">
+        <div class="monitor-card side">
+          <div class="monitor-card-head">
+            <div>
+              <h3>ALL 8 FIBRES · INSTANT PEAK</h3>
+              <span class="axis-note">Current sample on active blade</span>
+            </div>
+          </div>
+          <div class="monitor-chart short">
+            <canvas id="allFibreChart"></canvas>
+          </div>
+        </div>
+        <div class="monitor-card side">
+          <div class="monitor-card-head">
+            <div>
+              <h3>PREDICTIVE MODEL</h3>
+              <span class="axis-note">Damage index vs cycle · active fibre</span>
+            </div>
+          </div>
+          <div class="monitor-chart short">
+            <canvas id="predictChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <p class="monitor-note">
+        Note: Positive Force = Upward (Flapwise) · Positive Moment = Trailing Edge Down ·
+        Data replicated across 4 blades with 90° rotor phase offsets from bladedata.csv
+      </p>
+    </section>
+
+    <!-- Fingerprint tab -->
+    <section class="charts-grid hidden" id="tab-fingerprint">
+      <div class="panel chart-panel full light-panel">
+        <div class="chart-header">
+          <h2>Digital FingerPrint – <span id="fpTitle">—</span></h2>
+          <span class="badge-soft">Spatial strain profile along selected fibre (4 FBGs)</span>
+        </div>
+        <div class="chart-body tall">
+          <canvas id="fingerprintChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- TWIST TESTS tab -->
+    <section class="twist-section hidden" id="tab-twist">
+      <div class="twist-header panel">
+        <div>
+          <h2>Twist Tests – Cross-Blade Comparison</h2>
+          <p>
+            Optical-fibre torsion estimate from LE/TE and shear-web differentials
+            across all 4 blades (32 sensors). Phase-locked to the same fatigue cycle with 90° rotor offsets.
+          </p>
+        </div>
+        <div class="twist-kpis">
+          <div class="twist-kpi"><span>Max |twist|</span><b id="twistMaxAbs">—°</b></div>
+          <div class="twist-kpi"><span>Blade spread</span><b id="twistSpread">—°</b></div>
+          <div class="twist-kpi"><span>Station</span>
+            <select id="twistStation">
+              <option value="0">150 mm</option>
+              <option value="1">350 mm</option>
+              <option value="2" selected>600 mm</option>
+              <option value="3">820 mm</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="twist-grid">
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>TWIST VS TIME · ALL 4 BLADES</h3>
+              <span class="axis-note">Estimated twist angle (°) at selected station</span>
+            </div>
+          </div>
+          <div class="monitor-chart">
+            <canvas id="twistTimeChart"></canvas>
+          </div>
+        </div>
+
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>SPANWISE TWIST PROFILE</h3>
+              <span class="axis-note">Twist at 150 / 350 / 600 / 820 mm · current sample</span>
+            </div>
+          </div>
+          <div class="monitor-chart">
+            <canvas id="twistSpanChart"></canvas>
+          </div>
+        </div>
+
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>ROTOR TWIST SNAPSHOT</h3>
+              <span class="axis-note">Bar comparison · B1–B4 at selected station</span>
+            </div>
+          </div>
+          <div class="monitor-chart">
+            <canvas id="twistBarChart"></canvas>
+          </div>
+        </div>
+
+        <div class="monitor-card">
+          <div class="monitor-card-head">
+            <div>
+              <h3>TWIST RATE (dθ/dt)</h3>
+              <span class="axis-note">°/s · detects rapid torsional events</span>
+            </div>
+          </div>
+          <div class="monitor-chart">
+            <canvas id="twistRateChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="status-bar">
+      <div class="status-item">
+        <span class="status-label">HEALTH SCORE</span>
+        <span class="status-value green" id="healthScore">—</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">ALARM LEVEL</span>
+        <span class="status-value green" id="alarmLevel">GREEN</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">DATA LOGGING</span>
+        <span class="status-value" id="loggingState">OFF</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">SIM TIME</span>
+        <span class="status-value" id="simTime">0.00 s</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">SENSORS</span>
+        <span class="status-value mono">32 (4×8)</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">SOURCE</span>
+        <span class="status-value mono">bladedata.csv</span>
+      </div>
+      <button id="btnExport" class="btn export">↓ Export CSV Window</button>
+    </footer>
+  </div>
+
+  <div id="loading" class="loading-overlay">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <p>Loading 4-blade mill sensor data…</p>
+      <small>Replicating bladedata.csv across 32 optical fibres</small>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script type="module" src="blade-viewer.js"></script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact — BraggSense</title>
+  <meta name="description" content="Talk to BraggSense about FBG sensing, blade monitoring, or a live BraggSoft deployment." />
+  <link rel="icon" href="assets/images/logo.jpeg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        <svg class="brand-mark" viewBox="0 0 90 24" fill="none" aria-hidden="true"><path d="M2 12h58" stroke="#00d4e4" stroke-width="3.5" stroke-linecap="round"/><circle cx="40" cy="12" r="4.6" fill="#7aecf4"/><path d="M62 5.2 76 12 62 18.8Z" fill="#00d4e4"/></svg>
+        <div><div class="brand-name">BraggSense</div><div class="brand-sub">Technologies</div></div>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="technology.html">Technology</a>
+        <a href="solutions.html">Solutions</a>
+        <a href="products.html">Products</a>
+        <a href="platform.html">Platform</a>
+        <a href="company.html">Company</a>
+      </nav>
+      <div class="nav-cta">
+        <a class="btn btn-ghost" href="demo/index.html">Live demo</a>
+        <a class="btn btn-primary" href="contact.html">Talk to us</a>
+      </div>
+      <button class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false">Menu</button>
+    </div>
+  </header>
+  <div class="mobile-panel" data-mobile-panel>
+    <a href="technology.html">Technology</a><a href="solutions.html">Solutions</a><a href="products.html">Products</a><a href="platform.html">Platform</a><a href="company.html">Company</a><a href="demo/index.html">Live demo</a><a href="contact.html">Contact</a>
+  </div>
+
+  <section class="page-hero container">
+    <div class="eyebrow">Let’s discuss the asset</div>
+    <h1 class="section-title" style="max-width:18ch; margin-top:14px;">Tell us the measurement problem.</h1>
+    <p class="lead">Wind blade, bridge, rail, or composite test — describe the structure and we will come back with fibre layout and interrogator options.</p>
+  </section>
+
+  <section class="section band-navy">
+    <div class="container split">
+      <form class="form" data-contact-form>
+        <div class="form-row">
+          <label>Name<input name="name" required placeholder="Your name" /></label>
+          <label>Email<input name="email" type="email" required placeholder="you@company.com" /></label>
+        </div>
+        <div class="form-row">
+          <label>Organisation<input name="organisation" required placeholder="Company or lab" /></label>
+          <label>Application
+            <select name="application">
+              <option>Wind turbine blades</option>
+              <option>Civil infrastructure</option>
+              <option>Rail</option>
+              <option>Aerospace / composites</option>
+              <option>Energy / hydrogen</option>
+              <option>Other</option>
+            </select>
+          </label>
+        </div>
+        <label>Project notes<textarea name="message" placeholder="Asset type, environment, number of sensors, timeline"></textarea></label>
+        <div class="form-success">Opening your email client. If nothing appears, write to nagulapallysamanth@gmail.com.</div>
+        <button class="btn btn-primary" type="submit">Send enquiry</button>
+        <p class="form-note">Or email <a href="mailto:nagulapallysamanth@gmail.com">nagulapallysamanth@gmail.com</a> directly.</p>
+      </form>
+      <div>
+        <div class="card"><div class="card-body">
+          <div class="kicker">Direct</div>
+          <h3>BraggSense Technologies Pty Ltd</h3>
+          <p>Technical enquiries, datasheets, and demo walkthroughs.</p>
+          <p style="margin-top:16px;"><a href="mailto:nagulapallysamanth@gmail.com">nagulapallysamanth@gmail.com</a></p>
+          <p class="muted" style="margin-top:22px;">Prefer to see the product first? The WT-04 mill monitor is public.</p>
+          <a class="btn btn-ghost" style="margin-top:16px;" href="demo/index.html">Open live demo</a>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="brand" style="margin-bottom:14px;"><svg class="brand-mark" viewBox="0 0 90 24" fill="none" aria-hidden="true"><path d="M2 12h58" stroke="#00d4e4" stroke-width="3.5" stroke-linecap="round"/><circle cx="40" cy="12" r="4.6" fill="#7aecf4"/><path d="M62 5.2 76 12 62 18.8Z" fill="#00d4e4"/></svg><div class="brand-name">BraggSense</div></div>
+          <p>braggsense.com</p>
+        </div>
+        <div><h5>Product</h5><ul><li><a href="products.html">Products</a></li><li><a href="platform.html">Platform</a></li></ul></div>
+        <div><h5>Solutions</h5><ul><li><a href="solutions.html">Applications</a></li></ul></div>
+        <div><h5>Legal</h5><ul><li><a href="privacy.html">Privacy</a></li></ul></div>
+      </div>
+      <div class="footer-bottom"><span>© <span data-year></span> BraggSense Technologies Pty Ltd</span><span>Precision in every wavelength.</span></div>
+    </div>
+  </footer>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
