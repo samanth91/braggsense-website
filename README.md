@@ -2,12 +2,13 @@
 
 Static marketing site for **BraggSense Technologies Pty Ltd**, plus the live **WT-04 blade optical-fibre monitor** under `/demo/`.
 
-Built to deploy on **GitHub Pages** with the custom domain `braggsense.com`. No build step.
+Live now: https://samanth91.github.io/braggsense-website/
+
+The previous Next.js site is preserved on the `old-nextjs` branch.
 
 ## Local preview
 
 ```bash
-cd braggsense.com
 python3 -m http.server 4173
 ```
 
@@ -15,16 +16,23 @@ Open http://localhost:4173
 
 ## GitHub Pages
 
-1. Create a public repo (recommended name: `braggsense.com` or `braggsense`).
-2. Push this folder to `main`.
-3. Settings → Pages → Deploy from branch `main` / root (`/`).
-4. The `CNAME` file already contains `braggsense.com`.
-5. At your DNS host, add:
-   - `A` records for `@` to GitHub Pages IPs, or
-   - `CNAME` for `www` → `<user>.github.io`
-6. In the repo Pages settings, confirm the custom domain and enable HTTPS.
+This repo deploys from `main` / root. No build step.
 
-`.nojekyll` is included so GitHub does not process the site as Jekyll (needed for folders that start with `_` and for raw static files).
+### Custom domain (braggsense.com)
+
+When DNS is ready:
+
+1. Add a `CNAME` file on `main` containing `braggsense.com`
+2. In the repo: Settings → Pages → Custom domain → `braggsense.com` → HTTPS
+3. At the DNS host:
+
+| Type | Name | Value |
+|---|---|---|
+| A | @ | 185.199.108.153 |
+| A | @ | 185.199.109.153 |
+| A | @ | 185.199.110.153 |
+| A | @ | 185.199.111.153 |
+| CNAME | www | samanth91.github.io |
 
 ## Site map
 
@@ -41,8 +49,4 @@ Open http://localhost:4173
 
 ## Contact
 
-The contact form opens a `mailto:` to `nagulapallysamanth@gmail.com` so it works on GitHub Pages. To use Formspree later, set the form `action` to your Formspree endpoint.
-
-## Demo data
-
-`/demo/` is the Blade Optical Fibre Monitor: 4 blades × 8 fibres, driven by `blade-data.json` (downsampled from the laboratory `bladedata.csv`).
+The contact form opens a `mailto:` to `nagulapallysamanth@gmail.com` so it works on GitHub Pages.
